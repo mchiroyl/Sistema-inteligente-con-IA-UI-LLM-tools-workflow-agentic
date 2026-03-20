@@ -1,0 +1,23 @@
+TICKET DE SOPORTE TÉCNICO
+=========================
+Sistema: Centro de Atención al Usuario — TI
+Fecha: 2026-03-12
+Hora: 09:45 AM
+
+REPORTANTE: María González
+DEPARTAMENTO: Contabilidad
+EXTENSIÓN: 2245
+EQUIPO ASIGNADO: Laptop HP ProBook 450 G9 — Serial: HP2024-0823
+
+DESCRIPCIÓN DEL PROBLEMA:
+La computadora portátil no enciende desde esta mañana. 
+Al presionar el botón de encendido aparece la luz del cargador por 2 segundos 
+y luego se apaga. Intenté quitar y volver a conectar el cargador pero el 
+problema persiste. El equipo estaba funcionando correctamente ayer al final del día.
+
+INFORMACIÓN ADICIONAL:
+- No hubo caídas físicas ni derrames
+- El cargador es el original del equipo
+- Batería cargada al 100% según el último uso
+
+IMPACTO: No puedo acceder al sistema de nóminas para el cierre mensual.

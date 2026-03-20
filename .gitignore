@@ -1,0 +1,45 @@
+# Project Root .gitignore
+
+# Credenciales — NUNCA al repositorio
+.env
+.env.*
+!.env.example
+
+# Datos / Bases de datos locales
+backend/app/historial_tickets.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Entorno virtual
+venv/
+env/
+.venv/
+.env/
+
+# Archivos subidos temporalmente
+uploads/
+temp_uploads/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+

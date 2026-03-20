@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Support Intake AI — Análisis Inteligente de Tickets</title>
+  <meta name="description" content="Sistema inteligente de análisis de tickets de soporte técnico con IA. Sube tu documento y obtén análisis estructurado al instante." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+
+  <!-- ── Background decorative blobs ── -->
+  <div class="bg-blob blob-1" aria-hidden="true"></div>
+  <div class="bg-blob blob-2" aria-hidden="true"></div>
+  <div class="bg-blob blob-3" aria-hidden="true"></div>
+
+  <div class="layout-wrapper">
+    <!-- ── Sidebar ── -->
+    <nav class="sidebar" id="sidebar" aria-label="Menú principal">
+      <div class="sidebar-brand">
+        <div class="brand-icon" aria-hidden="true">🤖</div>
+        <h2 class="sidebar-title">Support Intake <span class="accent">AI</span></h2>
+      </div>
+
+      <div class="sidebar-nav" role="tablist">
+        <button id="tabUpload" class="sidebar-btn active" role="tab" aria-selected="true" aria-controls="viewUpload">
+          <span class="btn-icon" aria-hidden="true">➕</span> Nuevo Análisis
+        </button>
+        <button id="tabDashboard" class="sidebar-btn" role="tab" aria-selected="false" aria-controls="viewDashboard">
+          <span class="btn-icon" aria-hidden="true">🏠</span> Dashboard
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="status-indicator">
+          <span class="badge-dot" aria-hidden="true"></span>
+          Sistema activo
+        </div>
+      </div>
+    </nav>
+
+    <!-- ── Sidebar overlay (mobile) ── -->
+    <div id="sidebarOverlay" class="sidebar-overlay" aria-hidden="true"></div>
+
+    <!-- ── Main Content Area ── -->
+    <div class="main-content">
+      <header class="content-header">
+        <!-- Hamburger button (mobile only) -->
+        <button id="menuToggle" class="menu-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="sidebar">
+          <span></span><span></span><span></span>
+        </button>
+
+        <div class="header-info">
+          <h2 id="currentViewTitle">Nuevo Análisis</h2>
+          <p class="header-subtitle">Optimizado con OpenAI</p>
+        </div>
+        
+        <!-- Interactive Chart Placeholder for Dashboard (hidden in Upload) -->
+        <div class="chart-header hidden" id="headerChartArea">
+      <div class="chart-mini-info">
+        <div class="mini-label">Distribución<br>de<br>Prioridades</div>
+        <!-- El 3-light Traffic Light se renderizará aquí -->
+      </div>
+    </div>
+      </header>
+
+      <main class="page-container">
+
+      <!-- ========================================== -->
+      <!-- VIEW: DASHBOARD                            -->
+      <!-- ========================================== -->
+      <section id="viewDashboard" class="tab-content" role="tabpanel" aria-labelledby="tabDashboard">
+        
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card glass-card" data-filter="all">
+            <div class="kpi-title">Total Procesados</div>
+            <div class="kpi-value" id="kpiTotal">0</div>
+          </div>
+          <div class="kpi-card glass-card success-border" data-filter="success">
+            <div class="kpi-title">Completados</div>
+            <div class="kpi-value kpi-success" id="kpiSuccess">0</div>
+          </div>
+          <div class="kpi-card glass-card warning-border" data-filter="needs_review">
+            <div class="kpi-title">En Revisión</div>
+            <div class="kpi-value kpi-warning" id="kpiReview">0</div>
+          </div>
+          <div class="kpi-card glass-card error-border" data-filter="error">
+            <div class="kpi-title">Errores</div>
+            <div class="kpi-value kpi-error" id="kpiError">0</div>
+          </div>
+          <div class="kpi-card glass-card ai-border" data-filter="ai_direct">
+            <div class="kpi-title">IA Directa (100%)</div>
+            <div class="kpi-value kpi-ai" id="kpiAiDirect">0</div>
+          </div>
+          <div class="kpi-card glass-card human-border" data-filter="human">
+            <div class="kpi-title">Corregidos (Humano)</div>
+            <div class="kpi-value kpi-human" id="kpiHumanCorrected">0</div>
+          </div>
+        </div>
+
+        <!-- Dashboard Table Content -->
+        <div class="dashboard-table-view">
+
+          <!-- History Table -->
+          <div class="glass-card history-container">
+            <div class="history-header">
+              <h3 class="section-title">Historial de Tickets</h3>
+              <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="historySearch" placeholder="Buscar ticket..." aria-label="Buscar en historial">
+              </div>
+            </div>
+            
+            <div class="table-responsive">
+              <table class="data-table" id="historyTable">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Archivo</th>
+                    <th>Estado</th>
+                    <th>Prioridad</th>
+                  </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                  <!-- JS Data -->
+                </tbody>
+              </table>
+              <div id="historyTableEmpty" class="history-empty hidden">No se encontraron resultados.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VIEW: UPLOAD / NEW ANALYSIS                -->
+      <!-- ========================================== -->
+      <section id="viewUpload" class="tab-content active" role="tabpanel" aria-labelledby="tabUpload">
+
+      <!-- Upload Section -->
+      <section class="upload-section" id="uploadSection" aria-label="Subir documento">
+        <div class="glass-card">
+          <h2 class="section-title">Sube tu documento de soporte</h2>
+          <p class="section-subtitle">El sistema analizará el contenido, extraerá la información clave y evaluará la prioridad automáticamente.</p>
+
+          <!-- Drag & Drop Zone -->
+          <div
+            id="dropZone"
+            class="drop-zone"
+            role="button"
+            tabindex="0"
+            aria-label="Zona de arrastre. Haz clic o arrastra un archivo aquí"
+            aria-describedby="dropZoneHint"
+          >
+            <div class="drop-zone-icon" aria-hidden="true">📄</div>
+            <p class="drop-zone-title">Arrastra tu archivo aquí</p>
+            <p class="drop-zone-subtitle" id="dropZoneHint">o haz clic para seleccionar</p>
+            <div class="drop-zone-formats">
+              <span class="format-badge">PDF</span>
+              <span class="format-badge">PNG</span>
+              <span class="format-badge">JPG</span>
+              <span class="format-badge">TXT</span>
+            </div>
+            <p class="drop-zone-limit">Máximo 5 MB</p>
+          </div>
+
+          <input
+            id="fileInput"
+            type="file"
+            accept=".pdf,.png,.jpg,.jpeg,.txt"
+            aria-label="Seleccionar archivo"
+            class="file-input-hidden"
+          />
+
+          <!-- Selected file info -->
+          <div id="filePreview" class="file-preview hidden">
+            <div class="file-icon" aria-hidden="true" id="fileTypeIcon">📎</div>
+            <div class="file-info">
+              <span class="file-name" id="fileName">archivo.pdf</span>
+              <span class="file-size" id="fileSize">0 KB</span>
+            </div>
+            <button id="clearFile" class="btn-clear" aria-label="Eliminar archivo seleccionado">✕</button>
+          </div>
+
+          <!-- Analyze button -->
+          <button id="analyzeBtn" class="btn-analyze" disabled aria-label="Analizar documento con IA">
+            <span class="btn-icon" aria-hidden="true">🔍</span>
+            <span class="btn-text">Analizar con IA</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Processing Section -->
+      <section id="processingSection" class="processing-section hidden" aria-live="polite" aria-label="Estado del procesamiento">
+        <div class="glass-card processing-card">
+          <div class="processing-animation" aria-hidden="true">
+            <div class="orbit-ring">
+              <div class="orbit-dot dot-1"></div>
+              <div class="orbit-dot dot-2"></div>
+              <div class="orbit-dot dot-3"></div>
+            </div>
+            <div class="processing-icon">🧠</div>
+          </div>
+          <h2 class="processing-title">Analizando documento...</h2>
+
+          <div class="processing-steps">
+            <div class="step" id="step1" aria-label="Paso 1">
+              <div class="step-icon">📤</div>
+              <div class="step-info">
+                <span class="step-name">Recibiendo archivo</span>
+                <span class="step-status pending">Pendiente</span>
+              </div>
+            </div>
+            <div class="step" id="step2" aria-label="Paso 2">
+              <div class="step-icon">🔧</div>
+              <div class="step-info">
+                <span class="step-name">Extracción de metadatos (Tool 1)</span>
+                <span class="step-status pending">Pendiente</span>
+              </div>
+            </div>
+            <div class="step" id="step3" aria-label="Paso 3">
+              <div class="step-icon">📋</div>
+              <div class="step-info">
+                <span class="step-name">Evaluando política de soporte (Tool 2)</span>
+                <span class="step-status pending">Pendiente</span>
+              </div>
+            </div>
+            <div class="step" id="step4" aria-label="Paso 4">
+              <div class="step-icon">✅</div>
+              <div class="step-info">
+                <span class="step-name">Generando resultado estructurado</span>
+                <span class="step-status pending">Pendiente</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results Section -->
+      <section id="resultsSection" class="results-section hidden" aria-label="Resultados del análisis" aria-live="polite">
+
+        <!-- Status Banner -->
+        <div id="statusBanner" class="status-banner" role="alert"></div>
+
+        <div class="results-grid">
+
+          <!-- Summary Card -->
+          <div class="glass-card result-card">
+            <h3 class="card-title">
+              <span aria-hidden="true">📝</span> Resumen del Ticket
+            </h3>
+            <p id="summaryText" class="summary-text"></p>
+            <div class="doc-type-badge" id="docTypeBadge"></div>
+          </div>
+
+          <!-- Extracted Data Card -->
+          <div class="glass-card result-card">
+            <h3 class="card-title">
+              <span aria-hidden="true">📊</span> Datos Extraídos
+            </h3>
+            <div id="extractedDataContainer" class="data-grid"></div>
+          </div>
+
+          <!-- Priority Card -->
+          <div class="glass-card result-card priority-card" id="priorityCard">
+            <h3 class="card-title">
+              <span aria-hidden="true">🎯</span> Prioridad y Acción
+            </h3>
+            <div id="priorityInfo" class="priority-info"></div>
+          </div>
+
+          <!-- Warnings Card -->
+          <div class="glass-card result-card" id="warningsCard">
+            <h3 class="card-title">
+              <span aria-hidden="true">⚠️</span> Advertencias
+            </h3>
+            <ul id="warningsList" class="warnings-list" role="list"></ul>
+          </div>
+
+          <!-- Clarification Card -->
+          <div class="glass-card result-card clarification-card" id="clarificationCard">
+            <h3 class="card-title">
+              <span aria-hidden="true">❓</span> Preguntas de Aclaración
+            </h3>
+            <p class="clarification-intro">Se necesita información adicional para procesar este ticket:</p>
+            <ol id="questionsList" class="questions-list" role="list"></ol>
+          </div>
+
+          <!-- Tool Trace Card -->
+          <div class="glass-card result-card full-width">
+            <h3 class="card-title">
+              <span aria-hidden="true">🔍</span> Trazabilidad del Workflow
+            </h3>
+            <div id="toolTraceContainer" class="tool-trace"></div>
+          </div>
+
+        </div>
+        <!-- New Analysis Button -->
+        <div class="new-analysis-container">
+          <button id="newAnalysisBtn" class="btn-secondary" aria-label="Analizar otro documento">
+            <span aria-hidden="true">🔄</span> Analizar otro documento
+          </button>
+        </div>
+
+      </section>
+
+      </section> <!-- End viewUpload -->
+
+      </main>
+
+      <!-- ── Footer ── -->
+      <footer class="app-footer">
+        <p>Support Intake AI &bull; FastAPI + OpenAI + Pydantic v2 &bull; Agentic Workflow con Tool Calling</p>
+      </footer>
+    </div> <!-- End main-content -->
+  </div> <!-- End layout-wrapper -->
+    <!-- ── Edit Ticket Modal ── -->
+    <div id="editModal" class="modal hidden" role="dialog" aria-labelledby="modalTitle">
+      <div class="modal-content glass-card">
+        <div class="modal-header">
+          <h3 id="modalTitle">Corregir Información del Ticket</h3>
+          <button id="closeModal" class="btn-close">✕</button>
+        </div>
+        <div class="modal-body">
+          <form id="editForm">
+            <div class="form-group">
+              <label for="editReporter">Reportante</label>
+              <input type="text" id="editReporter" placeholder="Nombre de quien reporta">
+            </div>
+            <div class="form-group">
+              <label for="editDevice">Dispositivo / Sistema</label>
+              <input type="text" id="editDevice" placeholder="Ej: Laptop HP, SAP, etc.">
+            </div>
+            <div class="form-group">
+              <label for="editDescription">Descripción del Problema</label>
+              <textarea id="editDescription" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="editPriority">Prioridad</label>
+              <select id="editPriority">
+                <option value="Baja">Baja</option>
+                <option value="Media">Media</option>
+                <option value="Alta">Alta</option>
+                <option value="Crítica">Crítica</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="editStatus">Estado Final</label>
+              <select id="editStatus">
+                <option value="success">Completado</option>
+                <option value="needs_review">En Revisión</option>
+                <option value="error">Error</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button id="cancelEdit" class="btn-secondary">Cancelar</button>
+          <button id="saveEdit" class="btn-analyze">Guardar Cambios</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Toast Notifications Container ── -->
+    <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="false"></div>
+
+</body>
+</html>
